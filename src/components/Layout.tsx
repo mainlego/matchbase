@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import { ReactNode } from 'react';
 
 interface LayoutProps {
@@ -24,9 +25,9 @@ export default function Layout({ children, title = 'MatchBase - Спортивн
                 <h1 className="text-2xl font-bold text-primary">MatchBase</h1>
               </div>
               <nav className="flex space-x-4">
-                <a href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary">
+                <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary">
                   Главная
-                </a>
+                </Link>
                 <a href="#about" className="text-gray-700 dark:text-gray-300 hover:text-primary">
                   О нас
                 </a>
