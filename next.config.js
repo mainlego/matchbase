@@ -1,0 +1,10 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  env: {
+    NOWPAYMENTS_API_KEY: 'DQ1HPMB-6F94Y25-Q47KQMS-V90A5RQ',
+    NOWPAYMENTS_POS_URL: 'https://nowpayments.io/pos-terminal/matchbase',
+  },
+}
+
+module.exports = nextConfig
