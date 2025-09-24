@@ -5,7 +5,7 @@ const API_BASE_URL = 'https://api.nowpayments.io/v1';
 
 export async function createPayment(match: Match, userData: UserData): Promise<string> {
   try {
-    const orderDescription = `${match.sport} - ${match.homeTeam} vs ${match.awayTeam} (5 years stats)`;
+    const orderDescription = `${match.sport} - ${match.homeTeam} vs ${match.awayTeam} (8 years stats)`;
 
     const paymentParams = new URLSearchParams({
       amount: match.price.toString(),

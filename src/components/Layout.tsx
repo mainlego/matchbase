@@ -12,29 +12,34 @@ export default function Layout({ children, title = 'MatchBase - Спортивн
     <>
       <Head>
         <title>{title}</title>
-        <meta name="description" content="Профессиональная статистика спортивных матчей за 5 лет" />
+        <meta name="description" content="Профессиональная статистика спортивных матчей за 8 лет" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <header className="bg-white dark:bg-gray-900 shadow-sm">
+        <header className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-lg border-b border-gray-200/20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
+            <div className="flex items-center justify-between h-20">
               <div className="flex items-center">
                 <Link href="/" className="flex items-center gap-3">
-                  <img src="/logo.svg" alt="MatchBase" className="h-10 w-auto" />
+                  <img src="/logo.svg" alt="MatchBase" className="h-12 w-auto" />
+                  <span className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                    MatchBase
+                  </span>
                 </Link>
               </div>
-              <nav className="flex space-x-4">
-                <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary">
-                  Главная
+              <nav className="flex items-center space-x-8">
+                <Link href="/" className="text-gray-700 dark:text-gray-300 hover:text-primary transition-all duration-200 font-medium">
+                  Пакеты
                 </Link>
-                <a href="#about" className="text-gray-700 dark:text-gray-300 hover:text-primary">
-                  О нас
-                </a>
-                <a href="#contact" className="text-gray-700 dark:text-gray-300 hover:text-primary">
-                  Контакты
+                <a
+                  href="https://t.me/monroanim"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gradient-to-r from-primary to-blue-600 text-white px-6 py-2 rounded-full hover:shadow-lg hover:scale-105 transition-all duration-200 font-medium"
+                >
+                  Связаться
                 </a>
               </nav>
             </div>
@@ -49,7 +54,7 @@ export default function Layout({ children, title = 'MatchBase - Спортивн
               <div>
                 <h3 className="text-lg font-semibold mb-4">MatchBase</h3>
                 <p className="text-gray-600 dark:text-gray-400">
-                  Профессиональная статистика спортивных матчей с анализом за 5 лет
+                  Профессиональная статистика спортивных матчей с анализом за 8 лет
                 </p>
               </div>
               <div>
