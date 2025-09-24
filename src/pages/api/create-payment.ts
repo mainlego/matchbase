@@ -3,6 +3,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 const API_KEY = process.env.NOWPAYMENTS_API_KEY || 'DQ1HPMB-6F94Y25-Q47KQMS-V90A5RQ';
 const API_BASE_URL = 'https://api.nowpayments.io/v1';
 
+// Hardcoded USDT TRC20 address for payments
+const PAYMENT_ADDRESS = 'TPejFNbs17E1DeUJdtpLu55Mq5WNot2vMS';
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('Payment API called with method:', req.method);
 
@@ -11,18 +14,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // First check if NOWPayments API is available
-    try {
-      const statusResponse = await fetch(`${API_BASE_URL}/status`, {
-        headers: {
-          'x-api-key': API_KEY,
-        },
-      });
-      console.log('NOWPayments status check:', statusResponse.status);
-    } catch (statusError) {
-      console.log('NOWPayments status check failed:', statusError);
-    }
-
     const { packages, userData, total, isFullPackage, discount } = req.body;
 
     console.log('Payment request data:', {
@@ -43,122 +34,50 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ? `Full sports statistics package (all sports)`
       : `Sports statistics packages: ${packageNames}`;
 
-    // Create payment using NOWPayments API
-    const paymentData = {
-      price_amount: total,
-      price_currency: 'usd',
-      pay_currency: 'usdttrc20',
-      order_id: `PKG_${Date.now()}`,
-      order_description: orderDescription,
-      success_url: `${req.headers.origin || 'https://sport-matces.vercel.app'}/success`,
-      cancel_url: `${req.headers.origin || 'https://sport-matces.vercel.app'}/`,
-      ipn_callback_url: `${req.headers.origin || 'https://sport-matces.vercel.app'}/api/payment-callback`,
+    const orderId = `PKG_${Date.now()}`;
+
+    // For now, let's use a simple approach - create a payment page with instructions
+    // Since NOWPayments API seems to have issues with direct payment URL creation
+
+    console.log('Creating simple payment solution...');
+
+    // Create a payment instructions page
+    const paymentInstructions = {
+      order_id: orderId,
+      amount_usd: total,
+      amount_usdt: (total * 0.996).toFixed(2), // Approximate USDT amount
+      payment_address: PAYMENT_ADDRESS,
+      network: 'TRC20',
+      currency: 'USDT',
+      description: orderDescription,
+      customer_email: userData.email,
+      telegram: userData.telegramId
     };
 
-    console.log('API_KEY available:', !!API_KEY);
-    console.log('API_BASE_URL:', API_BASE_URL);
-    console.log('Sending payment data to NOWPayments:', JSON.stringify(paymentData, null, 2));
+    // Store payment info (in production, this should be in a database)
+    console.log('Payment instructions created:', paymentInstructions);
 
-    // Try creating an invoice first, which should return a checkout URL
-    console.log('Trying to create invoice...');
-    let response = await fetch(`${API_BASE_URL}/invoice`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-      },
-      body: JSON.stringify(paymentData),
-    });
+    // Create a simple payment link that will show instructions
+    const baseUrl = req.headers.origin || 'https://sport-matces.vercel.app';
+    const paymentUrl = `${baseUrl}/payment?` + new URLSearchParams({
+      order_id: orderId,
+      amount: total.toString(),
+      address: PAYMENT_ADDRESS,
+      network: 'TRC20',
+      email: userData.email
+    }).toString();
 
-    // If invoice endpoint doesn't work, fallback to payment endpoint
-    if (!response.ok) {
-      console.log('Invoice creation failed, trying payment endpoint...');
-      response = await fetch(`${API_BASE_URL}/payment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': API_KEY,
-        },
-        body: JSON.stringify(paymentData),
-      });
-    }
-
-    const responseText = await response.text();
-    console.log('NOWPayments response status:', response.status);
-    console.log('NOWPayments response:', responseText);
-
-    if (!response.ok) {
-      console.error('Payment API error:', response.status, responseText);
-
-      // If NOWPayments API is down, provide fallback
-      if (response.status >= 500) {
-        console.log('Using fallback payment method due to API error');
-        const fallbackUrl = `https://t.me/monroanim`;
-        return res.status(200).json({
-          payment_url: fallbackUrl,
-          fallback: true,
-          message: 'Payment service temporarily unavailable. Please contact support for manual payment.'
-        });
-      }
-
-      return res.status(response.status).json({
-        error: 'Payment API error',
-        details: responseText
-      });
-    }
-
-    let result;
-    try {
-      result = JSON.parse(responseText);
-    } catch (parseError) {
-      console.error('Failed to parse NOWPayments response:', parseError);
-      return res.status(500).json({
-        error: 'Invalid response from payment provider',
-        details: responseText
-      });
-    }
-
-    // NOWPayments API v1 doesn't return payment_url directly
-    // Instead, we construct a payment URL using the payment_id
-    if (!result.payment_id) {
-      console.error('No payment ID in response:', result);
-      return res.status(500).json({
-        error: 'No payment ID received from payment provider',
-        details: result
-      });
-    }
-
-    // Try different payment URL formats that NOWPayments might use
-    let paymentUrl;
-
-    // Method 1: Check if the response has any URL field
-    if (result.invoice_url) {
-      paymentUrl = result.invoice_url;
-    } else if (result.checkout_url) {
-      paymentUrl = result.checkout_url;
-    } else {
-      // Method 2: Use the payment_id with different URL formats
-      paymentUrl = `https://nowpayments.io/payment/?iid=${result.payment_id}&itype=paypro`;
-    }
-
-    console.log('Payment created successfully:', {
-      payment_id: result.payment_id,
-      pay_address: result.pay_address,
-      pay_amount: result.pay_amount,
-      pay_currency: result.pay_currency,
-      payment_url: paymentUrl,
-      full_response: result
-    });
+    console.log('Payment URL created:', paymentUrl);
 
     res.status(200).json({
       payment_url: paymentUrl,
       payment_details: {
-        payment_id: result.payment_id,
-        pay_address: result.pay_address,
-        pay_amount: result.pay_amount,
-        pay_currency: result.pay_currency,
-        payment_status: result.payment_status,
-        expiration_date: result.expiration_estimate_date
+        payment_id: orderId,
+        pay_address: PAYMENT_ADDRESS,
+        pay_amount: paymentInstructions.amount_usdt,
+        pay_currency: 'USDT TRC20',
+        payment_status: 'waiting',
+        instructions: 'Send exact amount to the provided address'
       }
     });
 
