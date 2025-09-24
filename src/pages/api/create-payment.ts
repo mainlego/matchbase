@@ -4,7 +4,7 @@ const API_KEY = process.env.NOWPAYMENTS_API_KEY || 'DQ1HPMB-6F94Y25-Q47KQMS-V90A
 const API_BASE_URL = 'https://api.nowpayments.io/v1';
 
 // Hardcoded USDT TRC20 address for payments
-const PAYMENT_ADDRESS = 'TPejFNbs17E1DeUJdtpLu55Mq5WNot2vMS';
+const PAYMENT_ADDRESS = 'TCJRMnnxbpT32EQP7hCRja5TUGmMDYMrVn';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('Payment API called with method:', req.method);
