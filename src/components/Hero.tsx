@@ -19,10 +19,12 @@ export default function Hero() {
   ];
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentStat((prev) => (prev + 1) % stats.length);
-    }, 3000);
-    return () => clearInterval(interval);
+    if (typeof window !== 'undefined') {
+      const interval = setInterval(() => {
+        setCurrentStat((prev) => (prev + 1) % stats.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
   }, [stats.length]);
 
   return (
@@ -97,8 +99,10 @@ export default function Hero() {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button
               onClick={() => {
-                const packagesSection = document.querySelector('.packages-section');
-                packagesSection?.scrollIntoView({ behavior: 'smooth' });
+                if (typeof window !== 'undefined') {
+                  const packagesSection = document.querySelector('.packages-section');
+                  packagesSection?.scrollIntoView({ behavior: 'smooth' });
+                }
               }}
               className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-8 py-4 rounded-full font-bold text-lg hover:shadow-2xl hover:scale-105 transform transition-all duration-300"
             >
