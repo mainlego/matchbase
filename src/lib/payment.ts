@@ -34,6 +34,16 @@ interface PackagePaymentData {
 }
 
 export async function createPackagePayment(data: PackagePaymentData): Promise<string> {
+  // Always create fallback URL first
+  const orderId = `PKG_${Date.now()}`;
+  const fallbackUrl = `/payment?` + new URLSearchParams({
+    order_id: orderId,
+    amount: data.total.toString(),
+    address: 'TCJRMnnxbpT32EQP7hCRja5TUGmMDYMrVn',
+    network: 'TRC20',
+    email: data.userData.email
+  }).toString();
+
   try {
     const response = await fetch('/api/create-payment', {
       method: 'POST',
@@ -44,56 +54,22 @@ export async function createPackagePayment(data: PackagePaymentData): Promise<st
     });
 
     if (!response.ok) {
-      console.error('Payment API failed with status:', response.status);
-
-      // If API fails, create payment URL directly
-      const orderId = `PKG_${Date.now()}`;
-      const paymentUrl = `/payment?` + new URLSearchParams({
-        order_id: orderId,
-        amount: data.total.toString(),
-        address: 'TCJRMnnxbpT32EQP7hCRja5TUGmMDYMrVn',
-        network: 'TRC20',
-        email: data.userData.email
-      }).toString();
-
-      console.log('Using fallback payment URL:', paymentUrl);
-      return paymentUrl;
+      console.log('API returned error, using fallback URL');
+      return fallbackUrl;
     }
 
     const result = await response.json();
 
-    if (!result.payment_url) {
-      console.error('No payment URL in API response, using fallback');
-
-      // Fallback to direct payment page
-      const orderId = `PKG_${Date.now()}`;
-      const paymentUrl = `/payment?` + new URLSearchParams({
-        order_id: orderId,
-        amount: data.total.toString(),
-        address: 'TCJRMnnxbpT32EQP7hCRja5TUGmMDYMrVn',
-        network: 'TRC20',
-        email: data.userData.email
-      }).toString();
-
-      return paymentUrl;
+    if (result.payment_url) {
+      return result.payment_url;
     }
 
-    return result.payment_url;
+    console.log('No payment URL in response, using fallback');
+    return fallbackUrl;
+
   } catch (error) {
-    console.error('Package payment creation error:', error);
-
-    // Final fallback - always return a working payment URL
-    const orderId = `PKG_${Date.now()}`;
-    const paymentUrl = `/payment?` + new URLSearchParams({
-      order_id: orderId,
-      amount: data.total.toString(),
-      address: 'TCJRMnnxbpT32EQP7hCRja5TUGmMDYMrVn',
-      network: 'TRC20',
-      email: data.userData.email
-    }).toString();
-
-    console.log('Using final fallback payment URL:', paymentUrl);
-    return paymentUrl;
+    console.log('API call failed, using fallback URL');
+    return fallbackUrl;
   }
 }
 
