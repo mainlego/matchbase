@@ -34,13 +34,79 @@ export default function PackageCard({ package: pkg }: PackageCardProps) {
 
   const isFullPackage = pkg.id === 'all-sports-package';
 
+  if (isFullPackage) {
+    return (
+      <div className={`
+        bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden
+        ${inCart ? 'ring-2 ring-purple-500 ring-opacity-50 transform scale-105' : ''}
+        ring-2 ring-purple-500 ring-opacity-30
+      `}>
+        <div className="md:flex">
+          {/* Left side - Header */}
+          <div className="md:w-1/3 bg-gradient-to-r from-purple-500 to-purple-700 p-8 text-white">
+            <div className="flex items-center justify-between mb-4">
+              <Icon size={40} />
+              <div className="text-right">
+                <div className="text-3xl font-bold">{pkg.price}</div>
+                <div className="text-lg opacity-90">{pkg.currency}</div>
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold mb-2">{pkg.name}</h3>
+            <p className="opacity-90 mb-4">{pkg.description}</p>
+            <div className="text-center">
+              <div className="text-4xl font-bold">
+                {pkg.matchCount}+
+              </div>
+              <div className="text-sm opacity-90">
+                матчей в пакете
+              </div>
+            </div>
+          </div>
+
+          {/* Right side - Features and Button */}
+          <div className="md:w-2/3 p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {pkg.features.map((feature, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <FaCheck className="text-green-500 mt-1 flex-shrink-0" size={14} />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                    {feature}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={handleToggleCart}
+              className={`
+                w-full py-4 px-8 rounded-lg font-bold text-lg transition-all duration-300
+                ${inCart
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-purple-600 text-white hover:bg-purple-700'
+                }
+              `}
+            >
+              {inCart ? (
+                <span className="flex items-center justify-center gap-3">
+                  <FaCheck size={20} />
+                  В корзине
+                </span>
+              ) : (
+                'Купить полный пакет'
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`
       bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden
       ${inCart ? 'ring-2 ring-primary ring-opacity-50 transform scale-105' : ''}
-      ${isFullPackage ? 'ring-2 ring-purple-500 ring-opacity-30' : ''}
     `}>
-      <div className={`p-6 text-white ${isFullPackage ? 'bg-gradient-to-r from-purple-500 to-purple-700' : 'bg-gradient-to-r from-primary to-blue-700'}`}>
+      <div className="bg-gradient-to-r from-primary to-blue-700 p-6 text-white">
         <div className="flex items-center justify-between mb-3">
           <Icon size={32} />
           <div className="text-right">

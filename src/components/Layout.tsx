@@ -65,7 +65,7 @@ export default function Layout({ children, title = 'MatchBase - Спортивн
                 <h3 className="text-lg font-semibold mb-4">Контакты</h3>
                 <p className="text-gray-600 dark:text-gray-400">
                   Email: support@matchbase.com<br />
-                  Telegram: @matchbase_support
+                  Telegram: <a href="https://t.me/monroanim" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-blue-700 transition-colors">@monroanim</a>
                 </p>
               </div>
             </div>

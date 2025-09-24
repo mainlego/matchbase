@@ -79,7 +79,8 @@ export default function CheckoutModal({ onClose }: CheckoutModalProps) {
                 </label>
                 <input
                   type="text"
-                  placeholder="@username или ID"
+                  placeholder="@monroanim"
+                  defaultValue="@monroanim"
                   {...register('telegramId', {
                     required: 'Telegram ID обязателен',
                     pattern: {

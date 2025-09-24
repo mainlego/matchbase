@@ -46,10 +46,30 @@ export default function Home() {
           onSelectSport={setSelectedSport}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mt-8">
-          {filteredPackages.map((pkg) => (
-            <PackageCard key={pkg.id} package={pkg} />
-          ))}
+        <div className="space-y-8 mt-8">
+          {/* Individual packages grid */}
+          <div>
+            <h3 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
+              Отдельные пакеты
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filteredPackages.filter(pkg => pkg.id !== 'all-sports-package').map((pkg) => (
+                <PackageCard key={pkg.id} package={pkg} />
+              ))}
+            </div>
+          </div>
+
+          {/* Full package - full width */}
+          {filteredPackages.find(pkg => pkg.id === 'all-sports-package') && (selectedSport === 'all' || selectedSport === 'football') && (
+            <div>
+              <h3 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
+                Полный пакет
+              </h3>
+              <div className="max-w-4xl mx-auto">
+                <PackageCard package={filteredPackages.find(pkg => pkg.id === 'all-sports-package')!} />
+              </div>
+            </div>
+          )}
         </div>
 
         {filteredPackages.length === 0 && (
