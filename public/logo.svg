@@ -1,0 +1,46 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="30" cy="30" r="25" fill="url(#gradient)" />
+
+  <!-- Sports icons integrated -->
+  <g transform="translate(20, 20)">
+    <!-- Football -->
+    <circle cx="5" cy="5" r="4" fill="white" opacity="0.9"/>
+    <path d="M3 5 L7 5 M5 3 L5 7" stroke="#1e40af" stroke-width="0.5"/>
+
+    <!-- Basketball -->
+    <circle cx="15" cy="5" r="4" fill="white" opacity="0.9"/>
+    <path d="M13 3 Q15 1 17 3 M13 7 Q15 9 17 7 M11 5 L19 5" stroke="#1e40af" stroke-width="0.5" fill="none"/>
+
+    <!-- Tennis -->
+    <circle cx="5" cy="15" r="4" fill="white" opacity="0.9"/>
+    <path d="M3 13 L7 17 M3 17 L7 13" stroke="#1e40af" stroke-width="0.8"/>
+
+    <!-- Volleyball -->
+    <circle cx="15" cy="15" r="4" fill="white" opacity="0.9"/>
+    <path d="M13 13 Q15 11 17 13 Q19 15 17 17 Q15 19 13 17 Q11 15 13 13" stroke="#1e40af" stroke-width="0.5" fill="none"/>
+  </g>
+
+  <!-- Company name -->
+  <text x="65" y="25" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#1e40af">
+    Match
+  </text>
+  <text x="65" y="45" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#3b82f6">
+    Base
+  </text>
+
+  <!-- Tagline -->
+  <text x="140" y="30" font-family="Arial, sans-serif" font-size="8" fill="#6b7280">
+    5 Years Stats
+  </text>
+  <text x="140" y="40" font-family="Arial, sans-serif" font-size="8" fill="#6b7280">
+    Professional Data
+  </text>
+</svg>

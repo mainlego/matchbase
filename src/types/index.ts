@@ -1,5 +1,17 @@
 export type Sport = 'football' | 'volleyball' | 'tennis' | 'basketball';
 
+export interface Package {
+  id: string;
+  sport: Sport;
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+  features: string[];
+  matchCount: number;
+  popular?: boolean;
+}
+
 export interface Match {
   id: string;
   sport: Sport;
@@ -54,10 +66,18 @@ export interface UserData {
 
 export interface Order {
   id: string;
-  matchId: string;
+  packageIds: string[];
   userData: UserData;
   amount: number;
   currency: string;
   status: 'pending' | 'paid' | 'cancelled';
   createdAt: Date;
+  isFullPackage?: boolean;
+}
+
+export interface CartItem {
+  packageId: string;
+  sport: Sport;
+  name: string;
+  price: number;
 }
