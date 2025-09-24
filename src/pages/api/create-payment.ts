@@ -11,6 +11,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    // First check if NOWPayments API is available
+    try {
+      const statusResponse = await fetch(`${API_BASE_URL}/status`, {
+        headers: {
+          'x-api-key': API_KEY,
+        },
+      });
+      console.log('NOWPayments status check:', statusResponse.status);
+    } catch (statusError) {
+      console.log('NOWPayments status check failed:', statusError);
+    }
+
     const { packages, userData, total, isFullPackage, discount } = req.body;
 
     console.log('Payment request data:', {
@@ -43,7 +55,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ipn_callback_url: `${req.headers.origin || 'https://sport-matces.vercel.app'}/api/payment-callback`,
     };
 
-    console.log('Sending payment data to NOWPayments:', paymentData);
+    console.log('API_KEY available:', !!API_KEY);
+    console.log('API_BASE_URL:', API_BASE_URL);
+    console.log('Sending payment data to NOWPayments:', JSON.stringify(paymentData, null, 2));
 
     const response = await fetch(`${API_BASE_URL}/payment`, {
       method: 'POST',
@@ -60,6 +74,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (!response.ok) {
       console.error('Payment API error:', response.status, responseText);
+
+      // If NOWPayments API is down, provide fallback
+      if (response.status >= 500) {
+        console.log('Using fallback payment method due to API error');
+        const fallbackUrl = `https://t.me/monroanim`;
+        return res.status(200).json({
+          payment_url: fallbackUrl,
+          fallback: true,
+          message: 'Payment service temporarily unavailable. Please contact support for manual payment.'
+        });
+      }
+
       return res.status(response.status).json({
         error: 'Payment API error',
         details: responseText
