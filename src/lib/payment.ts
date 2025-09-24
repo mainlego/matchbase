@@ -5,29 +5,20 @@ const API_BASE_URL = 'https://api.nowpayments.io/v1';
 
 export async function createPayment(match: Match, userData: UserData): Promise<string> {
   try {
-    const orderDescription = `${match.sport} - ${match.homeTeam} vs ${match.awayTeam} (8 years stats)`;
+    const data = {
+      packages: [{
+        packageId: match.id,
+        sport: match.sport,
+        name: `${match.homeTeam} vs ${match.awayTeam}`,
+        price: match.price
+      }],
+      userData,
+      total: match.price,
+      isFullPackage: false,
+      discount: 0
+    };
 
-    const paymentParams = new URLSearchParams({
-      amount: match.price.toString(),
-      currency: 'USD',
-      order_id: `${match.id}_${Date.now()}`,
-      order_description: orderDescription,
-      customer_email: userData.email,
-      success_url: `${window.location.origin}/success`,
-      cancel_url: `${window.location.origin}/match/${match.id}`,
-      partially_paid_url: `${window.location.origin}/partial`,
-      metadata: JSON.stringify({
-        telegramId: userData.telegramId,
-        email: userData.email,
-        matchId: match.id,
-        matchDetails: `${match.homeTeam} vs ${match.awayTeam}`,
-        statsYears: match.statsYears,
-      }),
-    });
-
-    const paymentUrl = `${POS_URL}?${paymentParams.toString()}`;
-
-    return paymentUrl;
+    return await createPackagePayment(data);
   } catch (error) {
     console.error('Payment creation error:', error);
     throw new Error('Failed to create payment');

@@ -23,7 +23,7 @@ export default function Hero() {
       setCurrentStat((prev) => (prev + 1) % stats.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [stats.length]);
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-primary via-blue-700 to-purple-800 text-white">
