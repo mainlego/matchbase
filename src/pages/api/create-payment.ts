@@ -59,7 +59,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log('API_BASE_URL:', API_BASE_URL);
     console.log('Sending payment data to NOWPayments:', JSON.stringify(paymentData, null, 2));
 
-    const response = await fetch(`${API_BASE_URL}/payment`, {
+    // Try creating an invoice first, which should return a checkout URL
+    console.log('Trying to create invoice...');
+    let response = await fetch(`${API_BASE_URL}/invoice`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -67,6 +69,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
       body: JSON.stringify(paymentData),
     });
+
+    // If invoice endpoint doesn't work, fallback to payment endpoint
+    if (!response.ok) {
+      console.log('Invoice creation failed, trying payment endpoint...');
+      response = await fetch(`${API_BASE_URL}/payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEY,
+        },
+        body: JSON.stringify(paymentData),
+      });
+    }
 
     const responseText = await response.text();
     console.log('NOWPayments response status:', response.status);
@@ -113,15 +128,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    // Create the payment URL using the payment_id
-    const paymentUrl = `https://nowpayments.io/payment/?iid=${result.payment_id}`;
+    // Try different payment URL formats that NOWPayments might use
+    let paymentUrl;
+
+    // Method 1: Check if the response has any URL field
+    if (result.invoice_url) {
+      paymentUrl = result.invoice_url;
+    } else if (result.checkout_url) {
+      paymentUrl = result.checkout_url;
+    } else {
+      // Method 2: Use the payment_id with different URL formats
+      paymentUrl = `https://nowpayments.io/payment/?iid=${result.payment_id}&itype=paypro`;
+    }
 
     console.log('Payment created successfully:', {
       payment_id: result.payment_id,
       pay_address: result.pay_address,
       pay_amount: result.pay_amount,
       pay_currency: result.pay_currency,
-      payment_url: paymentUrl
+      payment_url: paymentUrl,
+      full_response: result
     });
 
     res.status(200).json({
@@ -131,7 +157,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         pay_address: result.pay_address,
         pay_amount: result.pay_amount,
         pay_currency: result.pay_currency,
-        payment_status: result.payment_status
+        payment_status: result.payment_status,
+        expiration_date: result.expiration_estimate_date
       }
     });
 
