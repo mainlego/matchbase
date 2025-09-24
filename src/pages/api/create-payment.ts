@@ -103,16 +103,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    if (!result.payment_url) {
-      console.error('No payment URL in response:', result);
+    // NOWPayments API v1 doesn't return payment_url directly
+    // Instead, we construct a payment URL using the payment_id
+    if (!result.payment_id) {
+      console.error('No payment ID in response:', result);
       return res.status(500).json({
-        error: 'No payment URL received from payment provider',
+        error: 'No payment ID received from payment provider',
         details: result
       });
     }
 
-    console.log('Payment URL created successfully:', result.payment_url);
-    res.status(200).json({ payment_url: result.payment_url });
+    // Create the payment URL using the payment_id
+    const paymentUrl = `https://nowpayments.io/payment/?iid=${result.payment_id}`;
+
+    console.log('Payment created successfully:', {
+      payment_id: result.payment_id,
+      pay_address: result.pay_address,
+      pay_amount: result.pay_amount,
+      pay_currency: result.pay_currency,
+      payment_url: paymentUrl
+    });
+
+    res.status(200).json({
+      payment_url: paymentUrl,
+      payment_details: {
+        payment_id: result.payment_id,
+        pay_address: result.pay_address,
+        pay_amount: result.pay_amount,
+        pay_currency: result.pay_currency,
+        payment_status: result.payment_status
+      }
+    });
 
   } catch (error) {
     console.error('Payment creation error:', error);
